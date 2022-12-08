@@ -3,15 +3,28 @@ import pathlib
 import time
 from datetime import datetime
 from selenium import webdriver
+import vlc
+
+def start_audio():
+    # creating vlc media player object
+    media_player = vlc.MediaPlayer()
+    # media object
+    media = vlc.Media("noise.wav")
+    # setting media to the media player
+    media_player.set_media(media)
+    # start playing
+    media_player.play()
+
 
 parse_urls = ['https://www.gate.io/strategybot/detail?id=389182&&type=futures-boll&&name=Oscar-Darcy-Lyla']
 
-check_time = 5  # in min
+check_time = 15  # in min
 sleep_time = 10  # in sec
 
 driver_file_name = 'geckodriver_v0.31.0'
 curr_dir_path = pathlib.Path(__file__).parent.resolve()
 driver_path = os.path.join(curr_dir_path, driver_file_name)
+
 
 def click_by_element(driver=None, curr_url='', id_name=''):
     while True:
@@ -63,7 +76,13 @@ while True:
     for curr_url in parse_urls:
         # click_by_element(curr_url=curr_url, id_name='rc-tabs-0-tab-2')  # switch to the "Trades" tab
         data_date, data_time, data_side = parse_first_line_trades_tab(curr_url=curr_url, id_name='rc-tabs-0-tab-2')
-        print('True') if check_time_new_data(data_date=data_date, data_time=data_time) else print('False')
+        check_res = check_time_new_data(data_date=data_date, data_time=data_time)
+        if check_res:
+            print('True for ', curr_url)
+            start_audio()
+        else:
+            print('False for ', curr_url)
+
         print('sleep', sleep_time, 'secs')
         time.sleep(sleep_time)
 
