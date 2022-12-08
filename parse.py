@@ -4,6 +4,10 @@ import time
 from datetime import datetime
 from selenium import webdriver
 import vlc
+from pyvirtualdisplay import Display
+
+parse_urls = ['https://www.gate.io/strategybot/detail?id=389182&&type=futures-boll&&name=Oscar-Darcy-Lyla']
+
 
 def start_audio():
     # creating vlc media player object
@@ -15,8 +19,6 @@ def start_audio():
     # start playing
     media_player.play()
 
-
-parse_urls = ['https://www.gate.io/strategybot/detail?id=389182&&type=futures-boll&&name=Oscar-Darcy-Lyla']
 
 check_time = 15  # in min
 sleep_time = 10  # in sec
@@ -40,23 +42,36 @@ def click_by_element(driver=None, curr_url='', id_name=''):
             continue
 
 
+def open_driver_and_display():
+    display = Display(visible=0, size=(1920, 1080))
+    display.start()
+    driver = webdriver.Firefox(executable_path=driver_path)
+    return driver, display
+
+
+def close_driver_and_display(driver=None, display=None):
+    driver.close()
+    display.stop()
+    return None, None
+
+
 def parse_first_line_trades_tab(curr_url='', id_name=''):
     driver = None
     while True:
         try:
             if not driver:
-                driver = webdriver.Firefox(executable_path=driver_path)
-            click_by_element(driver=driver, curr_url=curr_url, id_name=id_name)  # switch to the "Trades" tab
+                driver, display = open_driver_and_display()
+                click_by_element(driver=driver, curr_url=curr_url, id_name=id_name)  # switch to the "Trades" tab
             data_date, data_time, data_side, data_price, data_currency, data_number_contracts, data_contract = driver.find_element_by_class_name(
                 'ant-table-row-level-0').text.split()
-            driver.close()
+            close_driver_and_display(driver=driver, display=display)
             return data_date, data_time, data_side
         except:
             print('error in parse_first_line_trades_tab ')
             print('sleep', 120, 'secs')
             time.sleep(120)
-            driver.close()
-            driver = None
+            if driver and display:
+                driver, display = close_driver_and_display(driver=driver, display=display)
             continue
 
 

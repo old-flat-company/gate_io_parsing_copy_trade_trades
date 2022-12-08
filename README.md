@@ -1,1 +1,2 @@
-# gate_io_parsing_copy_trade_trades
+###  Reqs:
+sudo apt-get install xvfb
