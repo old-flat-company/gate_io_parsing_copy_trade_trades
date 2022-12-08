@@ -57,13 +57,13 @@ def close_driver_and_display(driver=None, display=None):
 
 def parse_first_line_trades_tab(curr_url='', id_name=''):
     driver = None
+    display = None
     while True:
         try:
-            if not driver:
+            if not driver and not display:
                 driver, display = open_driver_and_display()
                 click_by_element(driver=driver, curr_url=curr_url, id_name=id_name)  # switch to the "Trades" tab
-            data_date, data_time, data_side, data_price, data_currency, data_number_contracts, data_contract = driver.find_element_by_class_name(
-                'ant-table-row-level-0').text.split()
+            data_date, data_time, data_side = driver.find_element_by_class_name('ant-table-row-level-0').text.split()[:3]
             close_driver_and_display(driver=driver, display=display)
             return data_date, data_time, data_side
         except:
@@ -85,8 +85,6 @@ def check_time_new_data(data_date='', data_time=''):
     return True if curr_unix_time - check_time * 60 <= new_data_unix_date_time else False
 
 
-# try:
-
 while True:
     for curr_url in parse_urls:
         # click_by_element(curr_url=curr_url, id_name='rc-tabs-0-tab-2')  # switch to the "Trades" tab
@@ -100,7 +98,3 @@ while True:
 
         print('sleep', sleep_time, 'secs')
         time.sleep(sleep_time)
-
-# except Exception as e:
-#     print(e)
-#     driver.close()
